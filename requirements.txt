@@ -1,0 +1,4 @@
+# --only-binary=cryptography
+requests
+jinjanator
+

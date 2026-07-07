@@ -1,0 +1,58 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 3 AM UTC every Monday, Wednesday, Friday
+    - cron: '0 3 * * 1,3,5'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check_changes.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install Python deps
+        run: |
+          ./pys -V
+      - name: Retrieve API data
+        run: |
+          make fetch
+      - name: Set Pages URL
+        run: |
+          echo "PAGES_URL=https://${GITHUB_REPOSITORY%/*}.github.io/${GITHUB_REPOSITORY##*/}/" >> "$GITHUB_ENV"
+      - name: Check for data changes
+        id: check_changes
+        run: |
+          make vcheck PAGES_URL="$PAGES_URL" GITHUB_OUTPUT="$GITHUB_OUTPUT"
+          # Note, make vcheck writes to GITHUB_OUTPUT changed=true|false
+      - name: Publish to deploy directory
+        if: steps.check_changes.outputs.changed == 'true'
+        run: make publish PAGES_URL="$PAGES_URL"
+      - name: Upload Pages artifact
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy/
+      # Deployment job
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: needs.build.outputs.changed == 'true'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

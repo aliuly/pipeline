@@ -1,0 +1,75 @@
+{#- human-readable file size helper -#}
+{% macro human_size(bytes) -%}
+{%- if bytes >= 1073741824 -%}
+{{ (bytes / 1073741824) | round(1) }} GB
+{%- elif bytes >= 1048576 -%}
+{{ (bytes / 1048576) | round(1) }} MB
+{%- elif bytes >= 1024 -%}
+{{ (bytes / 1024) | round(1) }} KB
+{%- else -%}
+{{ bytes }} B
+{%- endif -%}
+{%- endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-Cloud Public Pricing Pipeline</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHJlY3QgeD0iMyIgeT0iMjAiIHdpZHRoPSI4IiBoZWlnaHQ9IjEzIiByeD0iMiIgZmlsbD0iI0UyMDA3NCIvPjxyZWN0IHg9IjE0IiB5PSIxMCIgd2lkdGg9IjgiIGhlaWdodD0iMjMiIHJ4PSIyIiBmaWxsPSIjRTIwMDc0Ii8+PHJlY3QgeD0iMjUiIHk9IjQiIHdpZHRoPSI4IiBoZWlnaHQ9IjI5IiByeD0iMiIgZmlsbD0iI0UyMDA3NCIvPjwvc3ZnPg==" type="image/svg+xml">
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<header>
+  <h1>&#x1F4CA; T-Cloud Public Pricing Pipeline</h1>
+  <p>Offloaded pricing data from the T Cloud Public Price Calculator API</p>
+</header>
+<div class="container">
+  <div class="card">
+    <h2>&#x2728; Latest</h2>
+    <a class="latest-link" href="prices-latest.json">
+      <span class="label">&#x1F4E5; Download latest prices</span>
+      <span class="meta-row">
+        <span><strong>Date:</strong> {{ manifest[0].datetime }}</span>
+        <span><strong>Size:</strong> {{ human_size(manifest[0].size) }}</span>
+        <span><strong>Version:</strong> {{ manifest[0].generatedBy }}</span>
+        <span><strong>Checksum:</strong> {{ manifest[0].cksum }}</span>
+      </span>
+    </a>
+  </div>
+
+  {% if (manifest|length) > 1 %}
+  <div class="table-section">
+    <h2>&#x1F4C1; All Available Versions</h2>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Download</th><th>Size</th><th>Version</th><th>Checksum</th></tr>
+      </thead>
+      <tbody>
+      {% for i in manifest if i.cksum != manifest[0].cksum %}
+        <tr>
+          <td>{{ i.datetime }}</td>
+          <td><a href="{{ i.file }}">{{ i.file }}</a></td>
+          <td>{{ human_size(i.size) }}</td>
+          <td>{{ i.generatedBy }}</td>
+          <td>{{ i.cksum }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="count" id="version-count">{{ (manifest|length) - 1 }} previous version{{ 's' if (manifest|length) - 1 != 1 else '' }} available</div>
+  </div>
+  {% endif %}
+
+  <hr>
+  <div class="links">
+    <a href="https://docs.otc.t-systems.com/price-calculator/api-ref/">API docs</a>
+    &middot;
+    <a href="https://www.t-cloud-public.com/en">T Cloud Public</a></p>
+  </div>
+</div>
+<footer>
+  <a href="https://github.com/aliuly/pipeline">aliuly/pipeline</a>
+</footer>
+</body>
+</html>
