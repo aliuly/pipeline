@@ -30,6 +30,7 @@ def apply(apidat:dict) -> None:
   for grp in apidat['records']:
     for rec in apidat['records'][grp]:
       flat = [None]*len(keys)
+      flat[idx['_apiGrp']] = grp
       for k,v in rec.items():
         if not k in idx:
           _newfld(k,None,idx,keys,cols)

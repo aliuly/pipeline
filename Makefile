@@ -17,7 +17,7 @@ fetch: ## Fetch data and save to a file
 	$(PY) -m pipeline \
 			$$([ -f "cached.json" ] && echo --load cached.json) \
 			--cksum deploy/sum.txt \
-			--output deploy/prices-latest.json
+			--output deploy/prices-latest.json \
 			region=$(PARAM)
 
 vcheck:	## Check if version has changed
