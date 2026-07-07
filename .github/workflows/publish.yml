@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
       - name: Install Python deps
         run: |
-          ./pys -V
+          ./pys -m pipeline -V
       - name: Retrieve API data
         run: |
           make fetch
