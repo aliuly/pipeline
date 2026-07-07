@@ -127,24 +127,6 @@ Params:
 44455e0992b92bc06e427772bf7d825f 2026-07-07 10:25:46 1783412746.530722 pipeline v2ebf87b
 ```
 
-## GitHub Pages site
-
-The deployed site at the Pages URL shows:
-- **Latest snapshot** — download link with date, size (human‑readable), version, and checksum
-- **Version history** — sortable table of all previous snapshots
-- **Footer links** — source repo, API docs, T‑Cloud Public
-
-Styled with the Telekom magenta colour scheme (`#E20074`).
-
-## Scheduling
-
-The workflow runs automatically:
-- **Monday, Wednesday, Friday at 03:00 UTC** (cron `0 3 * * 1,3,5`)
-- **On push to `main`**
-- **Manual trigger** via `workflow_dispatch`
-
-When pricing data hasn't changed (identical checksum), the publish and deploy steps
-are skipped entirely.
 
 ## Licence
 
